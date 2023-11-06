@@ -1,0 +1,86 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+
+
+}
+
+<div class="row">
+    <div class="col">
+        <h3 class="mt-2 mb-3 alert alert-info display-6 text-center">Sports Summary</h3>
+        <div class="btn-toolbar mb-1 d-flex justify-content-end">
+            <div class="btn-group me-auto mb-2">
+                <button onclick="location.href='@Url.Action("Create", "Sports")'" class="btn btn-outline-primary btn-sm fw-bold" style="text-decoration:none;"><i class="fa fa-plus"></i> Add Sport</button>
+            </div>
+            @*<div id="spinner" style="display:none;"><i class="fa fa-spinner fa-spin"></i></div>*@
+            @using (Ajax.BeginForm("MasterView", new {},new AjaxOptions { Url = Url.Action("MasterView", "Sports"), HttpMethod = "POST", UpdateTargetId= "holder",InsertionMode=InsertionMode.Replace,AllowCache=false }, new {@class= "d-flex flex-row align-items-center flex-wrap" }))
+            {
+                <div class="input-group mb-2">
+                        <input type="text" name="search" placeholder="search by sport.." class="form-control-sm">&nbsp;
+                        <button class="btn btn-outline-secondary" type="submit"><i class="fa fa-search"></i></button>
+                </div>
+            }
+        </div>
+        <div id="holder">
+            @Html.Action("MasterView")
+        </div>
+    </div>
+</div>
+<div class="modal" tabindex="-1" role="dialog" id="playerModal">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title" id="exampleModalLabel">Player List</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="mBody">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <script>
+        $(document).ajaxStart(() => {
+            $("#spinner").show();
+        });
+
+        $(document).ajaxComplete(() => {
+            $("#spinner").hide();
+        });
+
+        $(document).ready(() => {
+            $(".info").click(function () {
+                getPlayers($(this).data("pk"));
+            })
+        });
+
+        function OnComplete() {
+            $(".info").click(function () {
+                getPlayers($(this).data("pk"));
+            })
+        }
+        function getPlayers(id) {
+            $.ajax({
+                url: "/Sports/PlayerList/" + id,
+                type: "POST",
+                dataType:"html"
+            })
+                .done((result) => {
+                    $("#mBody").html(result);
+                    $("#playerModal").modal("show");
+                })
+        }
+
+    </script>
+
+}
+@section styles{
+    <link href="~/Content/PagedList.css" rel="stylesheet" />
+    <link href="~/Content/font-awesome.css" rel="stylesheet" />
+}
